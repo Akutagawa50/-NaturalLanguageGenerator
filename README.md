@@ -3,4 +3,4 @@
 
 # 実行コマンド(Ubuntu18.04)
 g++ -o nlg main.cpp \
-./nlg | sort -rn
+ ./nlg | sort -rn | head -n 30
