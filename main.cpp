@@ -26,6 +26,7 @@ char NumberTrans(int x){    //0をaとしたときのアルファベットを返
 int main(){
     int alphacnt[27]={0};
     int alpha2cnt[27][27]={0};
+    int alpha3cnt[27][27][27]={0};
     
 
     ifstream ifs;
@@ -37,6 +38,7 @@ int main(){
 
     char c;
     char c0='*';    //1つ前のアルファベットを保存する変数．初期値はアルファベットとスペース以外の値を入れておく
+    char c00='*';   //2つ前のアルファベットを保存する変数．
     while((c=ifs.get()) != EOF){
         if(isalpha(c)){
             c=CapsTrans(c);             //小文字に変換
@@ -45,7 +47,7 @@ int main(){
         }
         else if(c=='\n'){
             ofs << c;
-            continue;//連続カウントをしないために
+            continue;//改行を連続カウントに含めないため
         }
         else{
             if(c0==' ')continue;    //連続スペースは数えない
@@ -54,9 +56,15 @@ int main(){
             ofs << c;
         }
 
-        if(c0!='*') //連続で並ぶパターンをカウント
+        if(c00!='*')//3連続で並ぶパターンをカウント
+            alpha3cnt[AlphaTrans(c00)][AlphaTrans(c0)][AlphaTrans(c)]++;
+        c00=c0;
+
+        if(c0!='*') //2連続で並ぶパターンをカウント
             alpha2cnt[AlphaTrans(c0)][AlphaTrans(c)]++;
         c0=c;
+
+
     }
     /*
     for(int i=0; i<27; i++){
@@ -64,9 +72,12 @@ int main(){
     }
     */
     for(int i=0; i<27; i++){
-        cout << alphacnt[i] << ": '" << NumberTrans(i) << "'" << endl;  //1つだけのときを出力
+        //cout << alphacnt[i] << ": '" << NumberTrans(i) << "'" << endl;  //1つだけのときを出力
         for(int j=0; j<27; j++){
-           cout << alpha2cnt[i][j] << ": '" << NumberTrans(i) << NumberTrans(j) << "'" << endl;     //2つのときを出力
+           //cout << alpha2cnt[i][j] << ": '" << NumberTrans(i) << NumberTrans(j) << "'" << endl;     //2つのときを出力
+           for(int k=0; k<27; k++){
+               cout << alpha3cnt[i][j][k] << ": '" << NumberTrans(i) << NumberTrans(j) << NumberTrans(k) << "'" << endl;
+           }
        }
    }
     return 0;
