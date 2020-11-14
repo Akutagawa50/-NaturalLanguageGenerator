@@ -85,38 +85,21 @@ int main(){
     int k = rand() % M-1;             //0~M-1までの乱数を取得
     ifs.seekg(k, ios_base::beg);    //k番目まで移動
     ofs << (char)ifs.get();
-    //ifs.seekg(k+1, ios_base::beg);
     char A = (char)ifs.get();
-    char B = (char) ifs.get();
     ofs << A;
-    ofs << B;
-    bool Aflag = false;
-    bool Bflag = false;
     for(int i=0; i<100; i++){
         k = rand() % M; //0~M-1までの乱数を取得
         for(int j=k; j<M; j++){       //k番目より後ろのAを探す
             ifs.seekg(j, ios_base::beg);
             char buf=ifs.get();
-            if(!Aflag && buf==A){         //Aがあったら出力して抜ける
+            if(buf==A){         //Aがあったら出力して抜ける
                 A=ifs.get();
                 ifs.seekg(j, ios_base::beg);    //もとの位置に戻す
                 ofs << A;
                 cout << "A" << endl;
-                Aflag=true;
-            }
-            if(!Bflag && buf==B){
-                B=ifs.get();
-                ofs << B;
-                cout << "B" << endl;
-                Bflag=true;
-            }
-            if(Aflag && Bflag){
-                cout << "break" << endl;
                 break;
-            }
-                
+            }   
         }
-        Aflag=Bflag=false;
     }
     cout << endl;
     ifs.close();
