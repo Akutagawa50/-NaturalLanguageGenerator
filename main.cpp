@@ -21,25 +21,24 @@ char NumberTrans(int x){    //0をaとしたときのアルファベットを返
     return x==26? ' ':(char)(x+97);
 }
 
-
-
 int main(){
     int alphacnt[27]={0};
     int alpha2cnt[27][27]={0};
     int alpha3cnt[27][27][27]={0};
     
-
     ifstream ifs;
     ofstream ofs;
     ifs.open("originaltext.txt");               //入力用ファイルを開く
     if(!ifs){cerr << "Cannot open originaltxt" << endl; return -1;}
-    ofs.open("generatedtxt.txt", ios::trunc);   //出力用ファイルを開く
-    if(!ofs){cerr << "Cannot open generatedtxt" << endl; return -1;}
+    ofs.open("convertedtxt.txt", ios::trunc);   //出力用ファイルを開く
+    if(!ofs){cerr << "Cannot open convertedtxt" << endl; return -1;}
 
+    int M=0;
     char c;
     char c0='*';    //1つ前のアルファベットを保存する変数．初期値はアルファベットとスペース以外の値を入れておく
     char c00='*';   //2つ前のアルファベットを保存する変数．
     while((c=ifs.get()) != EOF){
+        M++;    //文字数をカウント
         if(isalpha(c)){
             c=CapsTrans(c);             //小文字に変換
             alphacnt[AlphaTrans(c)]++;  //出てきたアルファベットをカウント
@@ -50,7 +49,7 @@ int main(){
             continue;//改行を連続カウントに含めないため
         }
         else{
-            if(c0==' ')continue;    //連続スペースは数えない
+            if(c0==' '){M--; continue;}    //連続スペースは数えない
             c=' ';  //スペースに置換
             alphacnt[26]++; //spaceをカウント
             ofs << c;
@@ -63,23 +62,65 @@ int main(){
         if(c0!='*') //2連続で並ぶパターンをカウント
             alpha2cnt[AlphaTrans(c0)][AlphaTrans(c)]++;
         c0=c;
-
-
     }
-    /*
-    for(int i=0; i<27; i++){
-        cout << alphacnt[i] << ": '" << NumberTrans(i) << "'" << endl;
-    }
-    */
+
     for(int i=0; i<27; i++){
         //cout << alphacnt[i] << ": '" << NumberTrans(i) << "'" << endl;  //1つだけのときを出力
         for(int j=0; j<27; j++){
            //cout << alpha2cnt[i][j] << ": '" << NumberTrans(i) << NumberTrans(j) << "'" << endl;     //2つのときを出力
            for(int k=0; k<27; k++){
-               cout << alpha3cnt[i][j][k] << ": '" << NumberTrans(i) << NumberTrans(j) << NumberTrans(k) << "'" << endl;
+               //cout << alpha3cnt[i][j][k] << ": '" << NumberTrans(i) << NumberTrans(j) << NumberTrans(k) << "'" << endl;
            }
        }
-   }
+    }
+    ifs.close();
+    ofs.close();
+
+    ifs.open("convertedtxt.txt");               //入力用ファイルを開く
+    if(!ifs){cerr << "Cannot open originaltxt" << endl; return -1;}
+    ofs.open("generatedtxt.txt", ios::trunc);   //出力用ファイルを開く
+    if(!ofs){cerr << "Cannot open generatedtxt" << endl; return -1;}
+    
+    srand((unsigned)time(NULL));    //乱数の開始を時刻で決める
+    int k = rand() % M-1;             //0~M-1までの乱数を取得
+    ifs.seekg(k, ios_base::beg);    //k番目まで移動
+    ofs << (char)ifs.get();
+    //ifs.seekg(k+1, ios_base::beg);
+    char A = (char)ifs.get();
+    char B = (char) ifs.get();
+    ofs << A;
+    ofs << B;
+    bool Aflag = false;
+    bool Bflag = false;
+    for(int i=0; i<100; i++){
+        k = rand() % M; //0~M-1までの乱数を取得
+        for(int j=k; j<M; j++){       //k番目より後ろのAを探す
+            ifs.seekg(j, ios_base::beg);
+            char buf=ifs.get();
+            if(!Aflag && buf==A){         //Aがあったら出力して抜ける
+                A=ifs.get();
+                ifs.seekg(j, ios_base::beg);    //もとの位置に戻す
+                ofs << A;
+                cout << "A" << endl;
+                Aflag=true;
+            }
+            if(!Bflag && buf==B){
+                B=ifs.get();
+                ofs << B;
+                cout << "B" << endl;
+                Bflag=true;
+            }
+            if(Aflag && Bflag){
+                cout << "break" << endl;
+                break;
+            }
+                
+        }
+        Aflag=Bflag=false;
+    }
+    cout << endl;
+    ifs.close();
+    ofs.close();
     return 0;
 }
 
