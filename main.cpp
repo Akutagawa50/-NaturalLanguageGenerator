@@ -22,18 +22,18 @@ char NumberTrans(int x){    //0をaとしたときのアルファベットを返
 }
 
 int main(){
-    int alphacnt[27]={0};
-    int alpha2cnt[27][27]={0};
-    int alpha3cnt[27][27][27]={0};
+    int alphacnt[27]={0};           //1文字の個数を記憶する変数
+    int alpha2cnt[27][27]={0};      //2文字の個数を記憶する変数
+    int alpha3cnt[27][27][27]={0};  //3文字の個数を記憶する変数
     
     ifstream ifs;
     ofstream ofs;
     ifs.open("originaltext.txt");               //入力用ファイルを開く
-    if(!ifs){cerr << "Cannot open originaltxt" << endl; return -1;}
-    ofs.open("convertedtxt.txt", ios::trunc);   //出力用ファイルを開く
-    if(!ofs){cerr << "Cannot open convertedtxt" << endl; return -1;}
+    if(!ifs){cerr << "Cannot open originaltext" << endl; return -1;}
+    ofs.open("convertedtext.txt", ios::trunc);   //出力用ファイルを開く
+    if(!ofs){cerr << "Cannot open convertedtext" << endl; return -1;}
 
-    int M=0;
+    int M=0;    //全体の文字数を記憶する変数
     char c;
     char c0='*';    //1つ前のアルファベットを保存する変数．初期値はアルファベットとスペース以外の値を入れておく
     char c00='*';   //2つ前のアルファベットを保存する変数．
@@ -63,9 +63,9 @@ int main(){
             alpha2cnt[AlphaTrans(c0)][AlphaTrans(c)]++;
         c0=c;
     }
-
+    //それぞれの結果をする
     for(int i=0; i<27; i++){
-        //cout << alphacnt[i] << ": '" << NumberTrans(i) << "'" << endl;  //1つだけのときを出力
+        cout << (double)alphacnt[i]/M * 100.0 << ": '" << NumberTrans(i)<< "'" << endl;  //1つだけのときを出力
         for(int j=0; j<27; j++){
            //cout << alpha2cnt[i][j] << ": '" << NumberTrans(i) << NumberTrans(j) << "'" << endl;     //2つのときを出力
            for(int k=0; k<27; k++){
@@ -76,10 +76,11 @@ int main(){
     ifs.close();
     ofs.close();
 
-    ifs.open("convertedtxt.txt");               //入力用ファイルを開く
-    if(!ifs){cerr << "Cannot open originaltxt" << endl; return -1;}
-    ofs.open("generatedtxt.txt", ios::trunc);   //出力用ファイルを開く
-    if(!ofs){cerr << "Cannot open generatedtxt" << endl; return -1;}
+    //自然言語生成の準備をする
+    ifs.open("convertedtext.txt");               //入力用ファイルを開く
+    if(!ifs){cerr << "Cannot open convertedtext" << endl; return -1;}
+    ofs.open("generatedtext.txt", ios::trunc);   //出力用ファイルを開く
+    if(!ofs){cerr << "Cannot open generatedtext" << endl; return -1;}
     
     srand((unsigned)time(NULL));    //乱数の開始を時刻で決める
     int k = rand() % M-1;             //0~M-1までの乱数を取得
@@ -87,21 +88,21 @@ int main(){
     ofs << (char)ifs.get();
     char A = (char)ifs.get();
     ofs << A;
+    
     for(int i=0; i<100; i++){
         k = rand() % M; //0~M-1までの乱数を取得
         for(int j=k; j<M; j++){       //k番目より後ろのAを探す
             ifs.seekg(j, ios_base::beg);
             char buf=ifs.get();
             if(buf==A){         //Aがあったら出力して抜ける
-                A=ifs.get();
+                A=ifs.get();    //Aの次の文字を代入
                 ifs.seekg(j, ios_base::beg);    //もとの位置に戻す
                 ofs << A;
-                cout << "A" << endl;
                 break;
             }   
         }
     }
-    cout << endl;
+    
     ifs.close();
     ofs.close();
     return 0;
